@@ -19,3 +19,6 @@ main.js
 .workbuddy
 data.json
 *.log
+
+.hotreload
+package-lock.json
