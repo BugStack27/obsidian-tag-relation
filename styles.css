@@ -1,0 +1,180 @@
+.tag-relation-view {
+	padding: 0 8px 8px;
+	overflow-y: auto;
+}
+
+.tag-relation-view .tag-relation-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+	padding: 8px 4px;
+	margin-bottom: 4px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: var(--background-primary);
+}
+
+.tag-relation-view .tag-relation-sort-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 4px;
+	border-radius: var(--radius-s);
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.tag-relation-view .tag-relation-sort-button:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.tag-relation-view .tag-relation-empty {
+	padding: 16px 8px;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	text-align: center;
+}
+
+.tag-relation-view .tag-relation-empty-title {
+	margin-bottom: 4px;
+}
+
+.tag-relation-view .tag-relation-empty-hint {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.5;
+}
+
+/* Rendered as a <button> for keyboard access; strip the theme button chrome. */
+.tag-relation-view .tag-relation-empty-action {
+	background: none;
+	border: none;
+	box-shadow: none;
+	padding: 0;
+	color: var(--text-accent);
+	font-size: inherit;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+.tag-relation-view .tag-relation-empty-action:hover {
+	text-decoration: underline;
+}
+
+.tag-relation-view .tag-relation-group {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.tag-relation-view .tag-relation-group:first-child {
+	margin-top: 4px;
+	padding-top: 4px;
+	border-top: none;
+}
+
+.tag-relation-view .tag-relation-group-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.tag-relation-view .tag-relation-group-toggle {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	color: var(--text-muted);
+}
+
+.tag-relation-view .tag-relation-group-label {
+	flex-shrink: 0;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.tag-relation-view .tag-relation-group-tags {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.tag-relation-view .tag-relation-group-count {
+	flex-shrink: 0;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.tag-relation-view .tag-relation-group-files.is-collapsed {
+	display: none;
+}
+
+.tag-relation-view .tag-relation-tag {
+	cursor: pointer;
+	user-select: none;
+	padding: 2px 6px;
+	border-radius: var(--radius-m);
+	background-color: var(--rainbow-bg, var(--tag-background, var(--background-modifier-hover)));
+	color: var(--rainbow-color, var(--tag-color, var(--text-muted)));
+	font-size: var(--font-ui-smaller);
+	line-height: 1.4;
+	transition: background-color 0.15s ease;
+}
+
+.tag-relation-view .tag-relation-tag:hover {
+	background-color: var(--tag-background-hover, var(--background-modifier-hover));
+}
+
+/* A rainbow tag keeps its own color on hover; only darken it a little. */
+.tag-relation-view .tag-relation-tag.tag-relation-tag-rainbow:hover {
+	background-color: color-mix(in srgb, var(--rainbow-bg) 86%, #000);
+	color: var(--rainbow-color);
+}
+
+.tag-relation-view .tag-relation-group-files {
+	display: flex;
+	flex-direction: column;
+}
+
+.tag-relation-view .tag-relation-file {
+	padding: 4px 2px;
+	border-radius: var(--radius-s);
+}
+
+.tag-relation-view .tag-relation-file:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.tag-relation-view .tag-relation-file-link {
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+.tag-relation-view .tag-relation-file-link:hover {
+	text-decoration: none;
+}
+
+.tag-relation-view .tag-relation-file-path {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	margin-top: 1px;
+}
+
+.tag-relation-view .tag-relation-file-summary {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	margin-top: 2px;
+	line-height: 1.4;
+}
