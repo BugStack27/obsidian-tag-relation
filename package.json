@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-tag-relation",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Right sidebar panel listing notes that share tags with the current note, grouped by shared tag sets.",
 	"main": "main.js",
 	"type": "module",

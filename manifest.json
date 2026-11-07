@@ -1,7 +1,7 @@
 {
 	"id": "tag-relation",
 	"name": "Tag Relation",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.7.2",
 	"description": "Show a right sidebar panel listing notes that share tags with the current note, grouped by shared tag sets.",
 	"author": "bugstack27",
