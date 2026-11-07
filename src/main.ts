@@ -25,7 +25,7 @@ export default class TagRelationPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'open-tag-relation',
+			id: 'open-panel',
 			name: '打开标签关系面板',
 			callback: () => {
 				void this.activateView();

@@ -28,7 +28,7 @@
 
 4. 确认并等待 BRAT 拉取最新 Release，然后在 **设置 → 第三方插件** 中启用 **Tag Relation**。
 
-手动安装：从 [Releases](https://github.com/bugstack27/obsidian-tag-relation/releases) 下载 `main.js`、`manifest.json`、`styles.css`，放入 `<库>/.obsidian/plugins/obsidian-tag-relation/`，重启 Obsidian 后启用。
+手动安装：从 [Releases](https://github.com/bugstack27/obsidian-tag-relation/releases) 下载 `main.js`、`manifest.json`、`styles.css`，放入 `<库>/.obsidian/plugins/tag-relation/`，重启 Obsidian 后启用。
 
 > BRAT 安装的是已发布的 Release。如果 Release 仍是 draft，需要先手动发布。
 
@@ -76,7 +76,7 @@ npm run lint    # ESLint 检查
 
 源码位于 `src/`，构建产物为 `main.js`（不纳入版本控制）。
 
-本地调试时，把 `main.js`、`manifest.json`、`styles.css` 复制到 `<库>/.obsidian/plugins/obsidian-tag-relation/`，重载 Obsidian 即可。
+本地调试时，把 `main.js`、`manifest.json`、`styles.css` 复制到 `<库>/.obsidian/plugins/tag-relation/`，重载 Obsidian 即可。
 
 ## 发布
 
