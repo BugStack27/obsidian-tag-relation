@@ -117,6 +117,8 @@ export class TagRelationSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.sortBy = value as SortBy;
 						await this.plugin.saveSettings();
+						// A new default supersedes any temporary sort picked in the panel.
+						this.plugin.clearTemporarySort();
 						this.plugin.refreshViews();
 					}),
 			);

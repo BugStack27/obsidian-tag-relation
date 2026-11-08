@@ -69,6 +69,18 @@ export default class TagRelationPlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Drop the panel-local sort overrides so the newly chosen default applies
+	 * everywhere. Called when the default in settings changes.
+	 */
+	clearTemporarySort() {
+		for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_TAG_RELATION)) {
+			if (leaf.view instanceof TagRelationView) {
+				leaf.view.clearTemporarySort();
+			}
+		}
+	}
+
 	async loadSettings() {
 		this.settings = Object.assign(
 			{},

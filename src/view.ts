@@ -4,6 +4,7 @@ import {
 	HoverPopover,
 	ItemView,
 	Menu,
+	Notice,
 	TAbstractFile,
 	TFile,
 	WorkspaceLeaf,
@@ -20,6 +21,13 @@ interface SettingManager {
 	open(): void;
 	openTabById(id: string): void;
 }
+
+/** Human-readable names for the sort modes, shared by the menu and the tooltip. */
+const SORT_LABELS: Record<SortBy, string> = {
+	name: '文件名称',
+	ctime: '创建时间（新的在前）',
+	mtime: '修改时间（新的在前）',
+};
 
 /** Fixed rainbow palette: red → orange → yellow → green → cyan → blue → violet. */
 const RAINBOW_COLORS: [string, string][] = [
@@ -56,6 +64,13 @@ export class TagRelationView extends ItemView implements HoverParent {
 	private summaryCache = new Map<string, { mtime: number; length: number; text: string }>();
 	private collapsedGroups = new Set<string>();
 	private listEl!: HTMLElement;
+	private sortBtnEl!: HTMLElement;
+	/**
+	 * Panel-local sort chosen from the title bar. It is deliberately kept in
+	 * memory only: switching the sort to glance at modified times must not
+	 * rewrite the default picked in settings. `null` means "follow the default".
+	 */
+	private temporarySortBy: SortBy | null = null;
 
 	constructor(leaf: WorkspaceLeaf, private plugin: TagRelationPlugin) {
 		super(leaf);
@@ -80,6 +95,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 		titleEl.createSpan({ text: '关联标签文档' });
 		const sortBtn = titleEl.createDiv('tag-relation-sort-button');
 		setIcon(sortBtn, 'arrow-up-narrow-wide');
+		this.sortBtnEl = sortBtn;
 		sortBtn.addEventListener('click', (event) => {
 			event.stopPropagation();
 			this.showSortMenu(event);
@@ -157,31 +173,85 @@ export class TagRelationView extends ItemView implements HoverParent {
 		this.scheduleRefresh();
 	}
 
-	/** Sort menu on the panel title: pick how notes inside each group are ordered. */
+	/** The sort actually used for rendering: panel-local override, else the default. */
+	private get activeSortBy(): SortBy {
+		return this.temporarySortBy ?? this.plugin.settings.sortBy;
+	}
+
+	/**
+	 * Sort menu on the panel title. Picking an entry only affects this panel
+	 * and is not persisted; persisting is a separate, explicit entry.
+	 */
 	private showSortMenu(event: MouseEvent): void {
 		const menu = new Menu();
-		const options: { id: SortBy; label: string }[] = [
-			{ id: 'name', label: '文件名称' },
-			{ id: 'ctime', label: '创建时间（新的在前）' },
-			{ id: 'mtime', label: '修改时间（新的在前）' },
-		];
-		for (const option of options) {
+		const active = this.activeSortBy;
+		for (const id of ['name', 'ctime', 'mtime'] as SortBy[]) {
 			menu.addItem((item) =>
 				item
-					.setTitle(option.label)
-					.setChecked(this.plugin.settings.sortBy === option.id)
-					.onClick(() => {
-						this.plugin.settings.sortBy = option.id;
-						void this.plugin.saveSettings();
-						this.refreshNow();
-					}),
+					.setTitle(SORT_LABELS[id])
+					.setChecked(active === id)
+					.onClick(() => this.setTemporarySort(id)),
+			);
+		}
+
+		if (this.temporarySortBy !== null) {
+			menu.addSeparator();
+			menu.addItem((item) =>
+				item
+					.setTitle(`设为默认排序（${SORT_LABELS[active]}）`)
+					.onClick(() => void this.makeSortDefault()),
+			);
+			menu.addItem((item) =>
+				item
+					.setTitle(`恢复默认排序（${SORT_LABELS[this.plugin.settings.sortBy]}）`)
+					.onClick(() => this.clearTemporarySort()),
 			);
 		}
 		menu.showAtMouseEvent(event);
 	}
 
+	/** Apply a panel-local sort. Re-picking the default simply drops the override. */
+	private setTemporarySort(sortBy: SortBy): void {
+		if (sortBy === this.plugin.settings.sortBy) {
+			this.clearTemporarySort();
+			return;
+		}
+		this.temporarySortBy = sortBy;
+		this.render();
+	}
+
+	/** Drop the panel-local sort so the panel follows the default again. */
+	clearTemporarySort(): void {
+		if (this.temporarySortBy === null) return;
+		this.temporarySortBy = null;
+		this.render();
+	}
+
+	/** Persist the panel-local sort as the new default, then follow it. */
+	private async makeSortDefault(): Promise<void> {
+		const sortBy = this.temporarySortBy;
+		if (sortBy === null) return;
+		this.temporarySortBy = null;
+		this.plugin.settings.sortBy = sortBy;
+		this.render();
+		await this.plugin.saveSettings();
+		new Notice(`已将「${SORT_LABELS[sortBy]}」设为默认排序`);
+	}
+
+	/** Keep the title-bar button in sync with the sort actually in use. */
+	private updateSortButton(): void {
+		if (!this.sortBtnEl) return;
+		const isTemporary = this.temporarySortBy !== null;
+		const label = isTemporary
+			? `临时排序：${SORT_LABELS[this.activeSortBy]}（仅本面板，重启恢复默认）`
+			: `排序：${SORT_LABELS[this.activeSortBy]}`;
+		this.sortBtnEl.setAttribute('aria-label', label);
+		this.sortBtnEl.toggleClass('is-temporary', isTemporary);
+	}
+
 	private render(): void {
 		this.listEl.empty();
+		this.updateSortButton();
 		const file = this.currentFile;
 
 		if (!file) {
@@ -194,7 +264,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 		const groups = computeRelationGroups(
 			this.app,
 			file,
-			this.plugin.settings.sortBy,
+			this.activeSortBy,
 			this.plugin.settings.ignoredTags,
 		);
 		if (groups.length === 0) {

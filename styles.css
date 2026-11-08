@@ -34,6 +34,11 @@
 	background-color: var(--background-modifier-hover);
 }
 
+/* A panel-local sort is in effect and differs from the default in settings. */
+.tag-relation-view .tag-relation-sort-button.is-temporary {
+	color: var(--text-accent);
+}
+
 .tag-relation-view .tag-relation-empty {
 	padding: 16px 8px;
 	color: var(--text-muted);
