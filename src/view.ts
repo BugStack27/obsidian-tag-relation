@@ -385,9 +385,13 @@ export class TagRelationView extends ItemView implements HoverParent {
 		const searchPlugin = (this.app as App & { internalPlugins?: unknown })
 			.internalPlugins as { plugins?: Record<string, { instance?: { openGlobalSearch(query: string): void } }> } | undefined;
 		const instance = searchPlugin?.plugins?.['global-search']?.instance;
-		if (instance) {
-			instance.openGlobalSearch(`tag:${tag}`);
+		if (!instance) {
+			new Notice(
+				'无法打开标签搜索：请先启用「全局搜索」核心插件（设置 → 核心插件）',
+			);
+			return;
 		}
+		instance.openGlobalSearch(`tag:${tag}`);
 	}
 
 	private renderFileRow(parent: HTMLElement, file: TFile): void {
