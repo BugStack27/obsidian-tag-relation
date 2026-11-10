@@ -29,7 +29,7 @@ Manual install: download `main.js`, `manifest.json` and `styles.css` from [Relea
 
 ## Usage
 
-After enabling, the plugin opens the **Tag relation** panel in the right sidebar. You can also run **Open tag relation panel** from the command palette, or click the ribbon icon.
+On first enable, the plugin opens the **Tag relation** panel in the right sidebar once. After that your layout is left as you set it; run **Open tag relation panel** from the command palette or click the ribbon icon whenever you want it back.
 
 1. Open a note that has tags.
 2. Read the groups of notes sharing those tags in the right sidebar.
@@ -121,7 +121,7 @@ Pushing the tag makes GitHub Actions run the type check and build, then create a
 
 ### 使用
 
-启用后，插件会在右侧边栏打开「标签关系」面板，也可以在命令面板执行 **打开标签关系面板**，或点击左侧功能区图标。
+首次启用时，插件会在右侧边栏打开一次「标签关系」面板；之后不再自动打开，布局完全由你决定。需要时可在命令面板执行 **打开标签关系面板**，或点击左侧功能区图标。
 
 1. 打开一篇带标签的笔记。
 2. 在右侧查看共享标签的笔记分组。

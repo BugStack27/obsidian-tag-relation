@@ -8,6 +8,8 @@ import { TagRelationView, VIEW_TYPE_TAG_RELATION } from './view';
 
 export default class TagRelationPlugin extends Plugin {
 	settings!: TagRelationSettings;
+	/** True only when the plugin has no saved data yet, i.e. a fresh install. */
+	private firstEnable = false;
 
 	async onload() {
 		await this.loadSettings();
@@ -34,10 +36,24 @@ export default class TagRelationPlugin extends Plugin {
 
 		this.addSettingTab(new TagRelationSettingTab(this.app, this));
 
-		// Open the panel in the right sidebar once the layout is ready.
 		this.app.workspace.onLayoutReady(() => {
-			void this.activateView();
+			void this.openOnFirstEnable();
 		});
+	}
+
+	/**
+	 * Show the panel once, on the first enable. Later launches and updates
+	 * leave the layout alone; the ribbon icon and command still open it.
+	 */
+	private async openOnFirstEnable(): Promise<void> {
+		if (this.settings.autoOpened) return;
+		this.settings.autoOpened = true;
+		await this.saveSettings();
+		// Existing installs upgrade without the marker; keep their layout as-is.
+		if (!this.firstEnable) return;
+		// A restored leaf already puts the panel on screen.
+		if (this.app.workspace.getLeavesOfType(VIEW_TYPE_TAG_RELATION).length > 0) return;
+		await this.activateView();
 	}
 
 	onunload() {
@@ -82,11 +98,9 @@ export default class TagRelationPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<TagRelationSettings>,
-		);
+		const stored = (await this.loadData()) as Partial<TagRelationSettings> | null;
+		this.firstEnable = stored === null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, stored);
 	}
 
 	async saveSettings() {

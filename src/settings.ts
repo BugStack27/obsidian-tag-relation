@@ -19,6 +19,11 @@ export interface TagRelationSettings {
 	 * exist: it never contributes to a shared-tag match or a group key.
 	 */
 	ignoredTags: string[];
+	/**
+	 * Internal marker: the panel has been opened automatically once. Not a
+	 * user-facing setting; afterwards the layout belongs to the user.
+	 */
+	autoOpened: boolean;
 }
 
 export const DEFAULT_SETTINGS: TagRelationSettings = {
@@ -28,6 +33,7 @@ export const DEFAULT_SETTINGS: TagRelationSettings = {
 	sortBy: 'name',
 	rainbowTags: false,
 	ignoredTags: [],
+	autoOpened: false,
 };
 
 /** Dropdown labels for the sort order, shared by both settings APIs. */
