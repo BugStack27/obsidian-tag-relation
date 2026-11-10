@@ -29,6 +29,13 @@ const SORT_LABELS: Record<SortBy, string> = {
 	mtime: '修改时间（新的在前）',
 };
 
+/** Compact names for the title-bar pill, where the full label is too long. */
+const SHORT_SORT_LABELS: Record<SortBy, string> = {
+	name: '文件名称',
+	ctime: '创建时间',
+	mtime: '修改时间',
+};
+
 /** Fixed rainbow palette: red → orange → yellow → green → cyan → blue → violet. */
 const RAINBOW_COLORS: [string, string][] = [
 	['#f5424b', '#ffffff'], // red
@@ -65,6 +72,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 	private collapsedGroups = new Set<string>();
 	private listEl!: HTMLElement;
 	private sortBtnEl!: HTMLElement;
+	private sortLabelEl!: HTMLElement;
 	/**
 	 * Panel-local sort chosen from the title bar. It is deliberately kept in
 	 * memory only: switching the sort to glance at modified times must not
@@ -92,9 +100,12 @@ export class TagRelationView extends ItemView implements HoverParent {
 		this.contentEl.empty();
 		this.contentEl.addClass('tag-relation-view');
 		const titleEl = this.contentEl.createDiv('tag-relation-title');
-		titleEl.createSpan({ text: '关联标签文档' });
+		const headingEl = titleEl.createDiv('tag-relation-title-heading');
+		setIcon(headingEl.createSpan('tag-relation-title-icon'), 'tags');
+		headingEl.createSpan({ text: '关联标签文档' });
 		const sortBtn = titleEl.createDiv('tag-relation-sort-button');
 		setIcon(sortBtn, 'arrow-up-narrow-wide');
+		this.sortLabelEl = sortBtn.createSpan('tag-relation-sort-label');
 		this.sortBtnEl = sortBtn;
 		sortBtn.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -247,6 +258,9 @@ export class TagRelationView extends ItemView implements HoverParent {
 			: `排序：${SORT_LABELS[this.activeSortBy]}`;
 		this.sortBtnEl.setAttribute('aria-label', label);
 		this.sortBtnEl.toggleClass('is-temporary', isTemporary);
+		if (this.sortLabelEl) {
+			this.sortLabelEl.setText(SHORT_SORT_LABELS[this.activeSortBy]);
+		}
 	}
 
 	private render(): void {
@@ -255,7 +269,9 @@ export class TagRelationView extends ItemView implements HoverParent {
 		const file = this.currentFile;
 
 		if (!file) {
-			this.listEl.createDiv('tag-relation-empty', (el) =>
+			const empty = this.listEl.createDiv('tag-relation-empty');
+			setIcon(empty.createDiv('tag-relation-empty-icon'), 'tags');
+			empty.createDiv('tag-relation-empty-title', (el) =>
 				el.setText('当前没有打开的笔记'),
 			);
 			return;
@@ -288,6 +304,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 			this.plugin.settings.ignoredTags,
 		);
 		const empty = this.listEl.createDiv('tag-relation-empty');
+		setIcon(empty.createDiv('tag-relation-empty-icon'), 'tags');
 
 		if (state.total.length === 0) {
 			empty.createDiv('tag-relation-empty-title', (el) =>

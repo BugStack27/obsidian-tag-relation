@@ -1,6 +1,6 @@
 # Tag Relation
 
-An Obsidian plugin that adds a right sidebar panel listing the notes that **share tags** with the current note, grouped by the exact set of shared tags.
+![Tag Relation — a right sidebar panel listing the notes that share tags with the current note](assets/promo.png)An Obsidian plugin that adds a right sidebar panel listing the notes that **share tags** with the current note, grouped by the exact set of shared tags.
 
 [中文说明](#中文说明) · [Releases](https://github.com/bugstack27/obsidian-tag-relation/releases)
 
@@ -37,14 +37,14 @@ After enabling, the plugin opens the **Tag relation** panel in the right sidebar
 
 ## Settings
 
-| Setting | Default | Description |
-| --- | --- | --- |
-| Show path | On | Show the folder path next to each related note |
-| Show summary | On | Show the first paragraph of each related note |
-| Summary length | 80 | Maximum number of characters (20–300) |
-| Sort within group | File name | File name, creation time, or modification time |
-| Rainbow tag colors | Off | Generate a stable color per tag name |
-| Ignored tags | Empty | One tag per line, hierarchy prefixes, case-insensitive |
+| Setting            | Default   | Description                                            |
+| ------------------ | --------- | ------------------------------------------------------ |
+| Show path          | On        | Show the folder path next to each related note         |
+| Show summary       | On        | Show the first paragraph of each related note          |
+| Summary length     | 80        | Maximum number of characters (20–300)                  |
+| Sort within group  | File name | File name, creation time, or modification time         |
+| Rainbow tag colors | Off       | Generate a stable color per tag name                   |
+| Ignored tags       | Empty     | One tag per line, hierarchy prefixes, case-insensitive |
 
 Settings are stored in the plugin's `data.json` and are searchable in Obsidian's settings search (Obsidian 1.13.0 and later).
 
@@ -89,7 +89,7 @@ Pushing the tag makes GitHub Actions run the type check and build, then create a
 
 [0-BSD](LICENSE)
 
----
+***
 
 ## 中文说明
 
@@ -110,11 +110,9 @@ Pushing the tag makes GitHub Actions run the type check and build, then create a
 1. 在 **设置 → 第三方插件** 中关闭安全模式，安装并启用 **BRAT**。
 2. 打开 **BRAT** 的设置，选择 **Add Beta plugin**。
 3. 填入仓库地址：
-
    ```
    bugstack27/obsidian-tag-relation
    ```
-
 4. 确认并等待 BRAT 拉取最新 Release，然后在 **设置 → 第三方插件** 中启用 **Tag Relation**。
 
 手动安装：从 [Releases](https://github.com/bugstack27/obsidian-tag-relation/releases) 下载 `main.js`、`manifest.json`、`styles.css`，放入 `<库>/.obsidian/plugins/tag-relation/`，重启 Obsidian 后启用。
@@ -131,14 +129,14 @@ Pushing the tag makes GitHub Actions run the type check and build, then create a
 
 ### 设置
 
-| 设置项 | 默认值 | 说明 |
-| --- | --- | --- |
-| 显示路径 | 开 | 在关联笔记旁显示所在文件夹路径 |
-| 显示简要信息 | 开 | 在关联笔记下方显示首段内容 |
-| 简要信息长度 | 80 | 摘要最多显示的字符数（20–300） |
-| 组内排序 | 文件名称 | 可选文件名称、创建时间、修改时间 |
-| 标签使用彩虹颜色 | 关 | 按标签名生成稳定颜色 |
-| 忽略标签 | 空 | 每行一个标签，支持层级前缀，不区分大小写 |
+| 设置项      | 默认值  | 说明                   |
+| -------- | ---- | -------------------- |
+| 显示路径     | 开    | 在关联笔记旁显示所在文件夹路径      |
+| 显示简要信息   | 开    | 在关联笔记下方显示首段内容        |
+| 简要信息长度   | 80   | 摘要最多显示的字符数（20–300）   |
+| 组内排序     | 文件名称 | 可选文件名称、创建时间、修改时间     |
+| 标签使用彩虹颜色 | 关    | 按标签名生成稳定颜色           |
+| 忽略标签     | 空    | 每行一个标签，支持层级前缀，不区分大小写 |
 
 设置保存在插件的 `data.json` 中；Obsidian 1.13.0 及以上版本会把它们编入设置搜索。
 

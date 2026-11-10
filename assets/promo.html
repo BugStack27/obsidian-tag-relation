@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>Tag Relation — 宣传图</title>
+<style>
+  :root {
+    --bg: #f5f5fa;
+    --line: rgba(26, 22, 52, 0.09);
+    --text: #211f33;
+    --muted: #5d5a74;
+    --faint: #8a86a0;
+    --accent: #6f5cf1;
+    --accent-2: #0f9e91;
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 1280px;
+    height: 760px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 52px 56px 0;
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(900px 520px at 8% -10%, rgba(124, 101, 255, 0.16), transparent 62%),
+      radial-gradient(760px 520px at 105% 12%, rgba(15, 158, 145, 0.11), transparent 60%),
+      radial-gradient(700px 600px at 60% 120%, rgba(124, 101, 255, 0.09), transparent 65%);
+  }
+
+  /* Faint dotted texture */
+  .canvas::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(40, 30, 80, 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(1200px 700px at 50% 40%, #000 20%, transparent 78%);
+    pointer-events: none;
+  }
+
+  .grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 520px 1fr;
+    gap: 44px;
+    align-items: start;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ---------- Left column ---------- */
+  .left { display: flex; flex-direction: column; padding-top: 6px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 6px 12px 6px 10px;
+    border: 1px solid rgba(111, 92, 241, 0.30);
+    background: rgba(111, 92, 241, 0.07);
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #5b48c8;
+  }
+  .badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 8px rgba(15, 158, 145, 0.55);
+  }
+
+  h1 {
+    margin-top: 22px;
+    font-size: 62px;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    background: linear-gradient(100deg, #241f3d 10%, #5b48c8 56%, #0f9e91 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    font-size: 19px;
+    color: #4a4660;
+    letter-spacing: 0.01em;
+  }
+  .subtitle b { color: #0c8f83; font-weight: 600; }
+
+  .lede {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.72;
+    color: var(--muted);
+    max-width: 430px;
+  }
+
+  .features {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .feature { display: flex; gap: 12px; }
+  .ficon {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, rgba(111, 92, 241, 0.13), rgba(15, 158, 145, 0.09));
+    border: 1px solid rgba(111, 92, 241, 0.22);
+    color: #5f4dd0;
+  }
+  .ficon svg { width: 16px; height: 16px; }
+  .ftext { padding-top: 1px; }
+  .ftext .t { font-size: 14.5px; font-weight: 600; color: #2a2740; letter-spacing: 0.01em; }
+  .ftext .d { margin-top: 3px; font-size: 12.5px; line-height: 1.5; color: var(--faint); }
+
+  /* ---------- Right: mock panel ---------- */
+  .stage { position: relative; padding-top: 12px; min-width: 0; }
+
+  .glow {
+    position: absolute;
+    inset: 8% 4% 4% 2%;
+    background: radial-gradient(closest-side, rgba(111, 92, 241, 0.20), transparent 72%);
+    filter: blur(26px);
+    pointer-events: none;
+  }
+
+  .panel-wrap {
+    position: relative;
+    border-radius: 22px;
+    padding: 1px;
+    background: linear-gradient(155deg, rgba(111, 92, 241, 0.42), rgba(255, 255, 255, 0.9) 42%, rgba(15, 158, 145, 0.28));
+    box-shadow: 0 24px 60px rgba(38, 32, 84, 0.14);
+  }
+
+  .panel {
+    border-radius: 21px;
+    background: #ffffff;
+    overflow: hidden;
+    height: 552px;
+    position: relative;
+  }
+  .panel::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 70px;
+    background: linear-gradient(180deg, transparent, #ffffff 88%);
+    pointer-events: none;
+  }
+
+  .panel-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #fafafd;
+  }
+  .panel-bar .title {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .panel-bar .spacer { flex: 1; }
+  .panel-bar .chip {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--faint);
+    padding: 3px 9px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #ffffff;
+  }
+
+  .panel-body { padding: 4px 14px 10px; height: calc(100% - 45px); overflow: hidden; }
+
+  .view-title {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 2px 8px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    font-size: 13px; font-weight: 600;
+  }
+  .view-title .sort {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 500; color: var(--muted);
+    padding: 3px 7px; border-radius: 6px;
+    background: rgba(26, 22, 52, 0.05);
+  }
+
+  .group { padding: 9px 0 6px; }
+  .group + .group { border-top: 1px solid var(--line); }
+
+  .group-head {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--faint); font-size: 10.5px;
+  }
+  .group-head .label { flex-shrink: 0; }
+  .group-head .tags { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+  .count { flex-shrink: 0; font-size: 10.5px; color: var(--faint); }
+
+  .tag {
+    display: inline-block;
+    padding: 1.5px 7px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: #4d4966;
+    background: rgba(26, 22, 52, 0.06);
+  }
+  .tag.c1 { background: rgba(95, 112, 255, 0.10); color: #3d4bc4; box-shadow: inset 0 0 0 1px rgba(95, 112, 255, 0.30); }
+  .tag.c2 { background: rgba(20, 158, 178, 0.10); color: #0b7c8d; box-shadow: inset 0 0 0 1px rgba(20, 158, 178, 0.30); }
+  .tag.c3 { background: rgba(56, 160, 72, 0.10); color: #2b7c3a; box-shadow: inset 0 0 0 1px rgba(56, 160, 72, 0.28); }
+  .tag.c4 { background: rgba(224, 122, 35, 0.10); color: #a55a14; box-shadow: inset 0 0 0 1px rgba(224, 122, 35, 0.28); }
+  .tag.c5 { background: rgba(140, 75, 200, 0.10); color: #7a3fb3; box-shadow: inset 0 0 0 1px rgba(140, 75, 200, 0.28); }
+
+  .files { margin-top: 5px; display: flex; flex-direction: column; }
+  .row { padding: 5px 8px; border-radius: 7px; }
+  .row.active { background: rgba(111, 92, 241, 0.07); box-shadow: inset 0 0 0 1px rgba(111, 92, 241, 0.16); }
+  .row .name {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: #262338;
+    letter-spacing: 0.01em;
+  }
+  .row .name .hint {
+    font-size: 9.5px; font-weight: 500; color: #6b5bd6;
+    border: 1px solid rgba(111, 92, 241, 0.28);
+    border-radius: 4px; padding: 0 4px; line-height: 1.5;
+  }
+  .row .path {
+    font-size: 10px; color: #8a86a0; margin-top: 1px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .row .summary {
+    font-size: 10.5px; color: #6f6b86; line-height: 1.5; margin-top: 3px;
+  }
+
+  .fade { position: relative; }
+  .fade::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+    background: linear-gradient(180deg, transparent, #ffffff 92%);
+    pointer-events: none;
+  }
+
+  /* Floating callouts, anchored to the faded bottom of the panel */
+  .float {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 13px 8px 9px;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(111, 92, 241, 0.28);
+    box-shadow:
+      0 16px 36px rgba(40, 34, 90, 0.16),
+      inset 0 1px 0 #ffffff;
+    font-size: 11.5px;
+    color: #4d4966;
+    white-space: nowrap;
+  }
+  .float .ico {
+    width: 25px; height: 25px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, rgba(111, 92, 241, 0.16), rgba(15, 158, 145, 0.10));
+    border: 1px solid rgba(111, 92, 241, 0.22);
+    color: #5f4dd0;
+  }
+  .float .ico svg { width: 13px; height: 13px; }
+  .float b { color: #17142a; font-weight: 600; }
+  .float .k {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+    color: #5b48c8; background: rgba(111, 92, 241, 0.10);
+    padding: 2px 6px; border-radius: 5px;
+  }
+  .float.a { left: -16px; bottom: -30px; }
+  .float.b { right: 6px; bottom: -30px; border-color: rgba(15, 158, 145, 0.28); }
+  .float.b .ico {
+    background: linear-gradient(160deg, rgba(15, 158, 145, 0.14), rgba(111, 92, 241, 0.08));
+    border-color: rgba(15, 158, 145, 0.24);
+    color: #0c8f83;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0 18px;
+    margin-top: 10px;
+    border-top: 1px solid rgba(26, 22, 52, 0.08);
+    font-size: 12px;
+    color: #8a86a0;
+  }
+  .footer .pills { display: flex; gap: 8px; }
+  .footer .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(26, 22, 52, 0.10);
+    background: rgba(255, 255, 255, 0.65);
+    color: #5d5a74;
+  }
+  .footer .pill svg { width: 12px; height: 12px; color: var(--accent-2); }
+  .footer .repo { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #6c6785; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="grid">
+      <!-- Left: pitch -->
+      <div class="left">
+        <div class="badge"><span class="dot"></span>Obsidian 社区插件</div>
+
+        <h1>Tag Relation</h1>
+        <div class="subtitle">按共享标签，<b>找到相关笔记</b></div>
+        <p class="lede">
+          在右侧边栏列出与当前笔记共享标签的文档，按共享标签组合精确分组；
+          点开一篇笔记，相关的内容就自动浮现在旁边。
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>
+              </svg>
+            </div>
+            <div class="ftext">
+              <div class="t">精确分组</div>
+              <div class="d">共享标签完全相同的笔记归为一组，按共享标签数量降序排列。</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7h16"/><path d="M7 12h13"/><path d="M10 17h10"/>
+              </svg>
+            </div>
+            <div class="ftext">
+              <div class="t">灵活排序</div>
+              <div class="d">文件名、创建时间、修改时间任选；面板内临时切换，也可设为默认。</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/>
+              </svg>
+            </div>
+            <div class="ftext">
+              <div class="t">路径与摘要</div>
+              <div class="d">显示所在文件夹与首段摘要，长度 20–300 字符自由调节。</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="15" cy="9.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="15" r="1.2" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div class="ftext">
+              <div class="t">彩虹标签 · 忽略标签</div>
+              <div class="d">每个标签固定颜色；私有标签可按层级前缀忽略，不参与统计。</div>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="ficon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 5h16v9H4z" rx="2"/><path d="M9 18h6"/><path d="M12 14v4"/>
+              </svg>
+            </div>
+            <div class="ftext">
+              <div class="t">顺畅交互</div>
+              <div class="d">点击打开、Ctrl 点击新标签页、点标签全局搜索、悬浮预览。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: panel mock -->
+      <div class="stage">
+        <div class="glow"></div>
+
+        <div class="panel-wrap">
+          <div class="panel">
+            <div class="panel-bar">
+              <div class="title">右侧边栏</div>
+              <div class="spacer"></div>
+              <div class="chip">自动跟随当前笔记</div>
+            </div>
+
+            <div class="panel-body">
+              <div class="view-title">
+                <span>关联标签文档</span>
+                <span class="sort">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6h16"/><path d="M7 12h13"/><path d="M10 18h10"/>
+                  </svg>
+                  排序：文件名称
+                </span>
+              </div>
+
+              <div class="group">
+                <div class="group-head">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="label">标签列表</span>
+                  <span class="tags">
+                    <span class="tag c2">#内存</span>
+                    <span class="tag c1">#操作系统</span>
+                  </span>
+                  <span class="count">2 篇</span>
+                </div>
+                <div class="files">
+                  <div class="row active">
+                    <div class="name">分段 <span class="hint">当前</span></div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                    <div class="summary">操作系统采用空闲空间列表的方式记录哪些空间还没有被使用，可以类比为一个链表。</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">虚拟化内存（VM）</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                    <div class="summary">操作系统为每个进程提供虚拟内存，而非真实的物理内存，以此保证进程之间的隔离性。</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="group">
+                <div class="group-head">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="label">标签列表</span>
+                  <span class="tags"><span class="tag c1">#操作系统</span></span>
+                  <span class="count">11 篇</span>
+                </div>
+                <div class="files">
+                  <div class="row">
+                    <div class="name">比例份额调度</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                    <div class="summary">也称为彩票调度，和多级反馈队列（MLFQ）不同的地方在于，它为每个作业分配一定比例的 CPU 时间。</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">多级反馈队列（MLFQ）</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                    <div class="summary">通过历史行为预测未来，让交互型作业优先得到响应，同时避免长任务被饿死。</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">记录分配的空间大小</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">嵌入空闲列表</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">匹配策略</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">空闲空间管理</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">内存碎片与紧凑</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="group">
+                <div class="group-head">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="label">标签列表</span>
+                  <span class="tags"><span class="tag c2">#内存</span></span>
+                  <span class="count">4 篇</span>
+                </div>
+                <div class="files">
+                  <div class="row">
+                    <div class="name">地址空间</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                  <div class="row">
+                    <div class="name">分页机制</div>
+                    <div class="path">读书笔记 / 操作系统导论</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="float a">
+          <span class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          </span>
+          <span class="k">TAG</span>
+          <span>点击标签 → 搜索 <b>tag:操作系统</b></span>
+        </div>
+        <div class="float b">
+          <span class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          </span>
+          <span class="k">HOVER</span>
+          <span>悬浮即可<b>预览笔记</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="pills">
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3z"/></svg>
+          完全本地 · 无网络请求
+        </span>
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/></svg>
+          桌面端与移动端
+        </span>
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+          Obsidian 1.7.2+
+        </span>
+      </div>
+      <div class="repo">github.com/bugstack27/obsidian-tag-relation</div>
+    </div>
+  </div>
+</body>
+</html>
