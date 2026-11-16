@@ -85,6 +85,22 @@ npm run build
     ```
 - Reload Obsidian and enable the plugin in **Settings → Community plugins**.
 
+### Test vault (local verification)
+
+- Test vault: `D:\job\obsidian\test-vault\test-plugin` (its `.obsidian` sits there).
+- The plugin folder in that vault is a Windows directory junction, so the vault reads this repository directly instead of a copied build:
+    ```
+    D:\job\obsidian\test-vault\test-plugin\.obsidian\plugins\tag-relation
+        -> D:\job\obsidian\obsidian-tag-relation
+    ```
+    Recreate it (if the vault is rebuilt) with PowerShell:
+    ```powershell
+    New-Item -ItemType Junction -Path '<vault>\.obsidian\plugins\tag-relation' -Target '<repo root>'
+    ```
+- Because of the junction, `main.js` / `manifest.json` / `styles.css` at the repository root are what Obsidian loads; Obsidian's `data.json` also lands there, which is why both are in `.gitignore`.
+- **After finishing a requirement, rebuild before handing it over** (`npm run build`), so the test vault serves the new bundle. The vault's `hot-reload` plugin reloads the plugin on change; otherwise toggle the plugin or restart Obsidian. Never leave `npm run dev` running in the background.
+- The vault is for the user's manual verification only: do not edit notes there, and do not commit vault files from this repository.
+
 ## Commands & settings
 
 - Any user-facing commands should be added via `this.addCommand(...)`.

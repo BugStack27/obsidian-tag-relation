@@ -1,4 +1,5 @@
 import { Plugin } from 'obsidian';
+import { isIgnoredTag, normalizeIgnoredTags } from './relations';
 import {
 	DEFAULT_SETTINGS,
 	TagRelationSettings,
@@ -74,6 +75,20 @@ export default class TagRelationPlugin extends Plugin {
 		if (!leaf) return;
 		await leaf.setViewState({ type: VIEW_TYPE_TAG_RELATION, active: true });
 		await workspace.revealLeaf(leaf);
+	}
+
+	/**
+	 * Append a tag to the ignore list and re-render the panels. The single
+	 * write path shared by the tag context menu, so the value goes through
+	 * the same normalization as the settings textarea.
+	 * Returns true only when the tag was not already covered.
+	 */
+	async ignoreTag(tag: string): Promise<boolean> {
+		if (isIgnoredTag(tag, this.settings.ignoredTags)) return false;
+		this.settings.ignoredTags = normalizeIgnoredTags([...this.settings.ignoredTags, tag]);
+		await this.saveSettings();
+		this.refreshViews();
+		return true;
 	}
 
 	/** Ask every open panel to re-render (used after settings changes). */

@@ -444,6 +444,28 @@ export class TagRelationView extends ItemView implements HoverParent {
 			event.stopPropagation();
 			this.openTagSearch(tag);
 		});
+		// Right-click ignores the tag in place, without a detour to settings.
+		tagEl.addEventListener('contextmenu', (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			this.showTagMenu(event, tag);
+		});
+	}
+
+	private showTagMenu(event: MouseEvent, tag: string): void {
+		const menu = new Menu();
+		menu.addItem((item) =>
+			item
+				.setTitle('忽略此标签')
+				.setIcon('eye-off')
+				.onClick(() => void this.ignoreTag(tag)),
+		);
+		menu.showAtMouseEvent(event);
+	}
+
+	private async ignoreTag(tag: string): Promise<void> {
+		const added = await this.plugin.ignoreTag(tag);
+		if (added) new Notice(`已忽略标签 #${tag}，可在插件设置的「忽略标签」中恢复`);
 	}
 
 	/** Open Obsidian's built-in search for the tag. */
