@@ -36,6 +36,21 @@ const SHORT_SORT_LABELS: Record<SortBy, string> = {
 	mtime: '修改时间',
 };
 
+/** Extension groups used to name an attachment in plain language. */
+const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg', 'avif']);
+const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'm4a', 'ogg', 'flac', '3gp']);
+const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'mov', 'mkv', 'ogv']);
+
+/** How the panel refers to a file that is not a Markdown note. */
+function describeNonNoteFile(file: TFile): string {
+	if (file.extension === 'pdf') return 'PDF 文件';
+	if (file.extension === 'canvas') return 'Canvas 文件';
+	if (IMAGE_EXTENSIONS.has(file.extension)) return '图片';
+	if (AUDIO_EXTENSIONS.has(file.extension)) return '音频';
+	if (VIDEO_EXTENSIONS.has(file.extension)) return '视频';
+	return '附件';
+}
+
 /** Fixed rainbow palette: red → orange → yellow → green → cyan → blue → violet. */
 const RAINBOW_COLORS: [string, string][] = [
 	['#f5424b', '#ffffff'], // red
@@ -286,6 +301,13 @@ export class TagRelationView extends ItemView implements HoverParent {
 			return;
 		}
 
+		// Attachments have no tags and no note body: telling the reader to "add
+		// tags to the note" is advice they cannot follow.
+		if (file.extension !== 'md') {
+			this.renderNonNote(file);
+			return;
+		}
+
 		const groups = computeRelationGroups(
 			this.app,
 			file,
@@ -300,6 +322,23 @@ export class TagRelationView extends ItemView implements HoverParent {
 		for (const group of groups) {
 			this.renderGroup(group);
 		}
+	}
+
+	/**
+	 * The active file is an attachment or a Canvas: explain that it is not a
+	 * Markdown note, so the reader does not look for lost tags or a broken plugin.
+	 */
+	private renderNonNote(file: TFile): void {
+		const empty = this.listEl.createDiv('tag-relation-empty');
+		setIcon(empty.createDiv('tag-relation-empty-icon'), 'tags');
+		empty.createDiv('tag-relation-empty-title', (el) =>
+			el.setText(`当前打开的是${describeNonNoteFile(file)}，不是 Markdown 笔记`),
+		);
+		empty.createDiv('tag-relation-empty-hint', (el) =>
+			el.setText(
+				'标签关系只统计 Markdown 笔记。想让这个文件参与关联，可以在笔记里链接它，再给那篇笔记添加 #标签',
+			),
+		);
 	}
 
 	/**

@@ -54,7 +54,7 @@ Settings are stored in the plugin's `data.json` and are searchable in Obsidian's
 - **Vault enumeration.** "Shares a tag with the current note" is a whole-vault question: to answer it, the plugin enumerates the paths of every Markdown file in the vault (`vault.getMarkdownFiles()`) on each refresh, and reads the tags of those files from Obsidian's in-memory metadata cache. This is the reason the plugin can see every file path in your vault — the enumeration is limited to that comparison, and only Markdown notes are considered.
 - **What is read.** Tags come from the metadata cache, not from the note bodies. Note bodies are read only for the notes the panel actually lists, and only when **Show summary** is on, to render the first paragraph of each of them.
 - **What is written.** Only the plugin's own `data.json`. The plugin never writes to, renames, moves, or deletes your notes, and never reads outside the vault.
-- **Scope.** Non-Markdown files are skipped entirely; attachments are never opened.
+- **Scope.** Non-Markdown files are skipped entirely when computing relations, and the plugin never opens attachments itself. When the active file is an attachment, an image or a Canvas, the panel says so instead of suggesting tags.
 
 ## Compatibility
 
