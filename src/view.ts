@@ -384,6 +384,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 		const tagEl = parent.createSpan({
 			cls: 'tag tag-relation-tag',
 			text: `#${tag}`,
+			attr: { title: `#${tag}` },
 		});
 		if (this.plugin.settings.rainbowTags) {
 			const { bg, color } = rainbowColor(tag);
@@ -417,6 +418,7 @@ export class TagRelationView extends ItemView implements HoverParent {
 		const linkEl = row.createEl('a', {
 			cls: 'tag-relation-file-link internal-link',
 			text: file.basename,
+			attr: { title: file.path },
 		});
 		linkEl.addEventListener('click', (event) => {
 			event.preventDefault();
