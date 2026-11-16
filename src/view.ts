@@ -70,6 +70,8 @@ export class TagRelationView extends ItemView implements HoverParent {
 	private refreshTimer: number | null = null;
 	private summaryCache = new Map<string, { mtime: number; length: number; text: string }>();
 	private collapsedGroups = new Set<string>();
+	/** Note path the collapsed set belongs to; a new note starts fully expanded. */
+	private collapsedForPath: string | null = null;
 	private listEl!: HTMLElement;
 	private sortBtnEl!: HTMLElement;
 	private sortLabelEl!: HTMLElement;
@@ -267,6 +269,13 @@ export class TagRelationView extends ItemView implements HoverParent {
 		this.listEl.empty();
 		this.updateSortButton();
 		const file = this.currentFile;
+
+		// Collapse state is per note: the same tag combination in another note
+		// must not inherit it, or a group folded once would hide its files everywhere.
+		if (file?.path !== this.collapsedForPath) {
+			this.collapsedGroups.clear();
+			this.collapsedForPath = file ? file.path : null;
+		}
 
 		if (!file) {
 			const empty = this.listEl.createDiv('tag-relation-empty');
