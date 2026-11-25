@@ -87,6 +87,8 @@ export class TagRelationView extends ItemView implements HoverParent {
 	private collapsedGroups = new Set<string>();
 	/** Note path the collapsed set belongs to; a new note starts fully expanded. */
 	private collapsedForPath: string | null = null;
+	/** Note path of the last render, used to tell a same-note refresh from a note switch. */
+	private renderedPath: string | null = null;
 	private listEl!: HTMLElement;
 	private sortBtnEl!: HTMLElement;
 	private sortLabelEl!: HTMLElement;
@@ -281,10 +283,21 @@ export class TagRelationView extends ItemView implements HoverParent {
 	}
 
 	private render(): void {
+		const file = this.currentFile;
+		// Keep the reader's place across refreshes that rebuild the same note's
+		// list, such as metadata changes or a sort switch. Only a note switch
+		// starts at the top.
+		const keepScroll = file !== null && file.path === this.renderedPath;
+		const scrollTop = keepScroll ? this.listEl.scrollTop : 0;
+		this.renderedPath = file ? file.path : null;
+
 		this.listEl.empty();
 		this.updateSortButton();
-		const file = this.currentFile;
+		this.renderList(file);
+		this.listEl.scrollTop = scrollTop;
+	}
 
+	private renderList(file: TFile | null): void {
 		// Collapse state is per note: the same tag combination in another note
 		// must not inherit it, or a group folded once would hide its files everywhere.
 		if (file?.path !== this.collapsedForPath) {
@@ -417,14 +430,18 @@ export class TagRelationView extends ItemView implements HoverParent {
 			this.renderFileRow(listEl, file);
 		}
 
-		// Click anywhere on the header (except tags) toggles the group.
+		// Click anywhere on the header (except tags) toggles the group. Toggling
+		// the style class in place keeps the list from rebuilding and jumping
+		// back to the top.
 		header.addEventListener('click', () => {
-			if (this.collapsedGroups.has(key)) {
-				this.collapsedGroups.delete(key);
-			} else {
+			const nowCollapsed = !this.collapsedGroups.has(key);
+			if (nowCollapsed) {
 				this.collapsedGroups.add(key);
+			} else {
+				this.collapsedGroups.delete(key);
 			}
-			this.render();
+			listEl.toggleClass('is-collapsed', nowCollapsed);
+			setIcon(toggleEl, nowCollapsed ? 'chevron-right' : 'chevron-down');
 		});
 	}
 
